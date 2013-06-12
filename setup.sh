@@ -54,7 +54,6 @@ stopraid()
 {
   mdadm --manage --stop /dev/md/md0
   echo stopped md0
-  echo
 }
 
 #############################################################################################
@@ -126,6 +125,15 @@ raid5_3()
   clearsuper
 
   mdadm --create -f --run md0 --level 5 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
+  echo created RAID5
+}
+
+raid5_3_missing()
+{
+  echo "Testing RAID5 (3 disks + 1 missing)"
+  clearsuper
+
+  mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 missing
   echo created RAID5
 }
 
@@ -270,9 +278,26 @@ setup_3disks()
 		mkfs.xfs -f -q /dev/md/md0
 		mount /dev/md/md0 $TARGET
 		;;
+	13)	raid5_3_missing
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	14)	raid5_3_missing
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	15)	raid5_3_missing
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	16)	raid5_3_missing
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+
 	esac
 }
-NUM_3DISK_TYPES=12
+NUM_3DISK_TYPES=16
 
 teardown_3disks()
 {
@@ -357,7 +382,8 @@ do_tests()
 {
   pushd $TARGET >/dev/null
 
-  /usr/local/bin/fsx -N 1000 -S0 foo
+  /usr/local/bin/fsx -N 10000 -S0 foo
+  /usr/local/bin/fsstress -d . -n 10000 -p 8 -r
 
   check_tainted
   popd >/dev/null
@@ -373,6 +399,7 @@ do
   setup_1disk $test
   do_tests
   teardown_1disk $test
+  echo
 done
 
 # 2 disk tests
@@ -383,6 +410,7 @@ if [ "$DISK2" != "" ]; then
     setup_2disks $test
     do_tests
     teardown_2disks $test
+    echo
   done
 fi
 
@@ -394,6 +422,7 @@ if [ "$DISK3" != "" ]; then
     setup_3disks $test
     do_tests
     teardown_3disks $test
+    echo
   done
 fi
 
@@ -405,5 +434,6 @@ if [ "$DISK4" != "" ]; then
     setup_4disks $test
     do_tests
     teardown_4disks $test
+    echo
   done
 fi
