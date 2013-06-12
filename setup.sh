@@ -2,7 +2,16 @@
 #
 # Storage/fs tests.
 #
-# TODO: btrfs raid.
+# Done:
+# - RAID0/1/5
+# - EXT4, XFS, BTRFS
+#
+# TODO:
+#  - RAID6/RAID10
+#  - btrfs raid.
+#  - LVM
+#  - dmcrypt
+#  - dmraid
 
 DISK1=sdb1
 DISK2=sdc1
@@ -22,53 +31,21 @@ check_tainted()
 }
 
 #############################################################################################
-# do the actual tests. This gets run in the target dir.
-
-do_tests()
-{
-    /usr/local/bin/fsx -N 1000 -S0 foo
-}
-
-#############################################################################################
-fs_loop()
-{
-  for FS in xfs btrfs ext4 ext4-1k
-  do
-    case "$FS" in
-    btrfs)
-	mkfs.btrfs -f /dev/md/md0
-        ;;
-    ext4)
-	mkfs.ext4 -F -q /dev/md/md0
-	;;
-    ext4-1k)
-	mkfs.ext4 -F -q -b 1024 /dev/md/md0
-	;;
-    xfs)
-	mkfs.xfs -f -q /dev/md/md0
-	;;
-    esac
-
-    echo Created $FS
-
-    mount /dev/md/md0 $TARGET
-    pushd $TARGET
-    do_tests
-    check_tainted
-    popd > /dev/null
-    umount $TARGET
-  done
-}
-
-#############################################################################################
-# setup/teardown routines.
+# setup/teardown helper routines.
 
 # Clear the first part of the disks to make mdadm not complain on subsequent creations.
 clearsuper()
 {
   dd if=/dev/zero of=/dev/$DISK1 bs=1M count=10 2> /dev/null &
-  dd if=/dev/zero of=/dev/$DISK2 bs=1M count=10 2> /dev/null &
-  dd if=/dev/zero of=/dev/$DISK3 bs=1M count=10 2> /dev/null &
+  if [ "$DISK2" != "" ]; then
+    dd if=/dev/zero of=/dev/$DISK2 bs=1M count=10 2> /dev/null &
+  fi
+  if [ "$DISK3" != "" ]; then
+    dd if=/dev/zero of=/dev/$DISK3 bs=1M count=10 2> /dev/null &
+  fi
+  if [ "$DISK4" != "" ]; then
+    dd if=/dev/zero of=/dev/$DISK4 bs=1M count=10 2> /dev/null &
+  fi
   wait
   echo Cleared partition header.
 }
@@ -81,7 +58,7 @@ stopraid()
 }
 
 #############################################################################################
-# RAID 0 tests
+# RAID 0 creation helpers
 
 raid0_2()
 {
@@ -111,7 +88,7 @@ raid0_4()
 }
 
 #############################################################################################
-# RAID 1 tests
+# RAID 1 creation helpers
 
 raid1_2()
 {
@@ -141,7 +118,7 @@ raid1_4()
 }
 
 #############################################################################################
-# RAID 5 tests
+# RAID 5 creation helpers
 
 raid5_3()
 {
@@ -162,35 +139,271 @@ raid5_4()
 }
 
 #############################################################################################
-# main()
+# Instantiate a storage type
+
+# 1 disk tests
+
+setup_1disk()
+{
+	case "$1" in
+	1)	mkfs.btrfs -f /dev/$DISK1
+		;;
+	2)	mkfs.ext4 -F -q /dev/$DISK1
+		;;
+	3)	mkfs.ext4 -F -q -b 1024 /dev/$DISK1
+		;;
+	4)	mkfs.xfs -f -q /dev/$DISK1
+		;;
+	esac
+	mount /dev/$DISK1 $TARGET
+}
+
+NUM_1DISK_TYPES=4
+
+teardown_1disk()
+{
+	umount $TARGET
+}
 
 # 2 disk tests
-for setup in raid0_2 raid1_2
+
+setup_2disks()
+{
+	case "$1" in
+	1)	raid0_2
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	2)	raid0_2
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	3)	raid0_2
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	4)	raid0_2
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	5)	raid1_2
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	6)	raid1_2
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	7)	raid1_2
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	8)	raid1_2
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	esac
+}
+
+NUM_2DISK_TYPES=8
+
+teardown_2disks()
+{
+	case "$1" in
+	*)	umount $TARGET
+		stopraid
+		;;
+	esac
+}
+
+#############################################################################################
+# 3 disk tests
+
+setup_3disks()
+{
+	case "$1" in
+	1)	raid0_3
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	2)	raid0_3
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	3)	raid0_3
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	4)	raid0_3
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	5)	raid1_3
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	6)	raid1_3
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	7)	raid1_3
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	8)	raid1_3
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	9)	raid5_3
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	10)	raid5_3
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	11)	raid5_3
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	12)	raid5_3
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	esac
+}
+NUM_3DISK_TYPES=12
+
+teardown_3disks()
+{
+	case "$1" in
+	*)	umount $TARGET
+		stopraid
+		;;
+	esac
+}
+
+#############################################################################################
+# 4 disk tests
+
+setup_4disks()
+{
+	case "$1" in
+	1)	raid0_4
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	2)	raid0_4
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	3)	raid0_4
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	4)	raid0_4
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	5)	raid1_4
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	6)	raid1_4
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	7)	raid1_4
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	8)	raid1_4
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	9)	raid5_4
+		mkfs.btrfs -f /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	10)	raid5_4
+		mkfs.ext4 -F -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	11)	raid5_4
+		mkfs.ext4 -F -q -b 1024 /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	12)	raid5_4
+		mkfs.xfs -f -q /dev/md/md0
+		mount /dev/md/md0 $TARGET
+		;;
+	esac
+}
+NUM_4DISK_TYPES=12
+
+teardown_4disks()
+{
+	case "$1" in
+	*)	umount $TARGET
+		stopraid
+		;;
+	esac
+}
+
+
+#############################################################################################
+# Call the various fs stress programs.
+do_tests()
+{
+  pushd $TARGET >/dev/null
+
+  /usr/local/bin/fsx -N 1000 -S0 foo
+
+  check_tainted
+  popd >/dev/null
+}
+
+#############################################################################################
+# main()
+
+# 1 disk tests
+for test in $(seq 1 $NUM_1DISK_TYPES)
 do
-  $setup
-  fs_loop
-  stopraid
+  echo "doing 1 disk test "$test"/"$NUM_1DISK_TYPES
+  setup_1disk $test
+  do_tests
+  teardown_1disk $test
 done
+
+# 2 disk tests
+if [ "$DISK2" != "" ]; then
+  for test in $(seq 1 $NUM_2DISK_TYPES)
+  do
+    echo "doing 2 disk test "$test"/"$NUM_2DISK_TYPES
+    setup_2disks $test
+    do_tests
+    teardown_2disks $test
+  done
+fi
 
 # 3 disk tests
 if [ "$DISK3" != "" ]; then
-  echo "Testing three disk configurations."
-  for setup in raid0_3 raid1_3 raid5_3
+  for test in $(seq 1 $NUM_3DISK_TYPES)
   do
-    $setup
-    fs_loop
-    stopraid
+    echo "doing 3 disk test "$test"/"$NUM_3DISK_TYPES
+    setup_3disks $test
+    do_tests
+    teardown_3disks $test
   done
 fi
 
 # 4 disk tests
 if [ "$DISK4" != "" ]; then
-  echo "Testing four disk configurations."
-  for setup in raid0_4 raid1_4 raid5_4
+  for test in $(seq 1 $NUM_4DISK_TYPES)
   do
-    $setup
-    fs_loop
-    stopraid
+    echo "doing 4 disk test "$test"/"$NUM_4DISK_TYPES
+    setup_4disks $test
+    do_tests
+    teardown_4disks $test
   done
 fi
-
