@@ -168,7 +168,7 @@ raid5_4()
 for setup in raid0_2 raid1_2
 do
   $setup
-  do_tests
+  fs_loop
   stopraid
 done
 
@@ -178,7 +178,7 @@ if [ "$DISK3" != "" ]; then
   for setup in raid0_3 raid1_3 raid5_3
   do
     $setup
-    do_tests
+    fs_loop
     stopraid
   done
 fi
