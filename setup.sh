@@ -125,7 +125,7 @@ raid5_3()
   echo "Testing RAID5 (3 disks)"
   clearsuper
 
-  mdadm --create -f --run md0 --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
+  mdadm --create -f --run md0 --level 5 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID5
 }
 
@@ -134,7 +134,7 @@ raid5_4()
   echo "Testing RAID5 (4 disks)"
   clearsuper
 
-  mdadm --create -f --run md0 --level 1 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
+  mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID5
 }
 
