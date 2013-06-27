@@ -170,6 +170,8 @@ NUM_1DISK_TYPES=4
 
 teardown_1disk()
 {
+	find $TARGET -exec rm -rf {} \; &
+	wait
 	umount $TARGET
 }
 
@@ -217,6 +219,9 @@ NUM_2DISK_TYPES=8
 
 teardown_2disks()
 {
+	find $TARGET -exec rm -rf {} \; &
+	wait
+
 	case "$1" in
 	*)	umount $TARGET
 		stopraid
@@ -301,6 +306,9 @@ NUM_3DISK_TYPES=16
 
 teardown_3disks()
 {
+	find $TARGET -exec rm -rf {} \; &
+	wait
+
 	case "$1" in
 	*)	umount $TARGET
 		stopraid
@@ -368,6 +376,9 @@ NUM_4DISK_TYPES=12
 
 teardown_4disks()
 {
+	find $TARGET -exec rm -rf {} \; &
+	wait
+
 	case "$1" in
 	*)	umount $TARGET
 		stopraid
