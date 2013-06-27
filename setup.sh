@@ -391,6 +391,11 @@ teardown_4disks()
 # Call the various fs stress programs.
 do_tests()
 {
+  if [ -f $TARGET/NOT-MOUNTED ]; then
+    echo something went wrong during mount
+    exit
+  fi
+
   pushd $TARGET >/dev/null
 
   /usr/local/bin/fsx -N 10000 -S0 foo
