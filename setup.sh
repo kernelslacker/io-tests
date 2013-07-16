@@ -62,8 +62,6 @@ stopraid()
 raid0_2()
 {
   echo "Testing RAID0 (2 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 0 --raid-devices 2 --rounding 64 /dev/$DISK1 /dev/$DISK2
   echo created RAID0
 }
@@ -71,8 +69,6 @@ raid0_2()
 raid0_3()
 {
   echo "Testing RAID0 (3 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 0 --raid-devices 3 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID0
 }
@@ -80,8 +76,6 @@ raid0_3()
 raid0_4()
 {
   echo "Testing RAID0 (4 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 0 --raid-devices 4 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID0
 }
@@ -92,8 +86,6 @@ raid0_4()
 raid1_2()
 {
   echo "Testing RAID1 (2 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 1 --raid-devices 2 /dev/$DISK1 /dev/$DISK2
   echo created RAID1
 }
@@ -101,8 +93,6 @@ raid1_2()
 raid1_3()
 {
   echo "Testing RAID1 (3 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID1
 }
@@ -110,8 +100,6 @@ raid1_3()
 raid1_4()
 {
   echo "Testing RAID1 (4 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID1
 }
@@ -122,8 +110,6 @@ raid1_4()
 raid5_3()
 {
   echo "Testing RAID5 (3 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 5 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID5
 }
@@ -131,8 +117,6 @@ raid5_3()
 raid5_3_missing()
 {
   echo "Testing RAID5 (3 disks + 1 missing)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 missing
   echo created RAID5
 }
@@ -140,8 +124,6 @@ raid5_3_missing()
 raid5_4()
 {
   echo "Testing RAID5 (4 disks)"
-  wipedisks
-
   mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID5
 }
@@ -153,6 +135,8 @@ raid5_4()
 
 setup_1disk()
 {
+	wipedisks
+
 	case "$1" in
 	1)	mkfs.btrfs -f /dev/$DISK1
 		;;
@@ -180,6 +164,8 @@ teardown_1disk()
 
 setup_2disks()
 {
+	wipedisks
+
 	case "$1" in
 	1)	raid0_2
 		mkfs.btrfs -f /dev/md/md0
@@ -237,6 +223,8 @@ teardown_2disks()
 
 setup_3disks()
 {
+	wipedisks
+
 	case "$1" in
 	1)	raid0_3
 		mkfs.btrfs -f /dev/md/md0
@@ -326,6 +314,8 @@ teardown_3disks()
 
 setup_4disks()
 {
+	wipedisks
+
 	case "$1" in
 	1)	raid0_4
 		mkfs.btrfs -f /dev/md/md0
