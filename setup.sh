@@ -36,15 +36,15 @@ check_tainted()
 # Clear the first part of the disks to make mdadm not complain on subsequent creations.
 clearsuper()
 {
-  wipefs -a $DISK1 &
+  wipefs -a /dev/$DISK1 &
   if [ "$DISK2" != "" ]; then
-    wipefs -a $DISK2 &
+    wipefs -a /dev/$DISK2 &
   fi
   if [ "$DISK3" != "" ]; then
-    wipefs -a $DISK3 &
+    wipefs -a /dev/$DISK3 &
   fi
   if [ "$DISK4" != "" ]; then
-    wipefs -a $DISK4 &
+    wipefs -a /dev/$DISK4 &
   fi
   wait
   echo Cleared partition header.
