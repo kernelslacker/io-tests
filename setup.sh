@@ -34,7 +34,7 @@ check_tainted()
 # setup/teardown helper routines.
 
 # Clear the first part of the disks to make mdadm not complain on subsequent creations.
-clearsuper()
+wipedisks()
 {
   wipefs -a /dev/$DISK1 &
   if [ "$DISK2" != "" ]; then
@@ -47,7 +47,7 @@ clearsuper()
     wipefs -a /dev/$DISK4 &
   fi
   wait
-  echo Cleared partition header.
+  echo Cleared filesystem structures.
 }
 
 stopraid()
@@ -62,7 +62,7 @@ stopraid()
 raid0_2()
 {
   echo "Testing RAID0 (2 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 0 --raid-devices 2 --rounding 64 /dev/$DISK1 /dev/$DISK2
   echo created RAID0
@@ -71,7 +71,7 @@ raid0_2()
 raid0_3()
 {
   echo "Testing RAID0 (3 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 0 --raid-devices 3 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID0
@@ -80,7 +80,7 @@ raid0_3()
 raid0_4()
 {
   echo "Testing RAID0 (4 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 0 --raid-devices 4 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID0
@@ -92,7 +92,7 @@ raid0_4()
 raid1_2()
 {
   echo "Testing RAID1 (2 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 1 --raid-devices 2 /dev/$DISK1 /dev/$DISK2
   echo created RAID1
@@ -101,7 +101,7 @@ raid1_2()
 raid1_3()
 {
   echo "Testing RAID1 (3 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID1
@@ -110,7 +110,7 @@ raid1_3()
 raid1_4()
 {
   echo "Testing RAID1 (4 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID1
@@ -122,7 +122,7 @@ raid1_4()
 raid5_3()
 {
   echo "Testing RAID5 (3 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 5 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID5
@@ -131,7 +131,7 @@ raid5_3()
 raid5_3_missing()
 {
   echo "Testing RAID5 (3 disks + 1 missing)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 missing
   echo created RAID5
@@ -140,7 +140,7 @@ raid5_3_missing()
 raid5_4()
 {
   echo "Testing RAID5 (4 disks)"
-  clearsuper
+  wipedisks
 
   mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID5
