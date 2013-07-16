@@ -172,6 +172,7 @@ teardown_1disk()
 {
 	find $TARGET -exec rm -rf {} \; &
 	wait
+	sync
 	umount $TARGET
 }
 
@@ -223,7 +224,9 @@ teardown_2disks()
 	wait
 
 	case "$1" in
-	*)	umount $TARGET
+	*)
+		sync
+		umount $TARGET
 		stopraid
 		;;
 	esac
@@ -310,7 +313,9 @@ teardown_3disks()
 	wait
 
 	case "$1" in
-	*)	umount $TARGET
+	*)
+		sync
+		umount $TARGET
 		stopraid
 		;;
 	esac
@@ -380,7 +385,9 @@ teardown_4disks()
 	wait
 
 	case "$1" in
-	*)	umount $TARGET
+	*)
+		sync
+		umount $TARGET
 		stopraid
 		;;
 	esac
