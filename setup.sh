@@ -56,6 +56,13 @@ stopraid()
   echo stopped md0
 }
 
+erase_mountpoint()
+{
+	find $TARGET -mount -exec rm -rf {} \; &
+	wait
+	sync
+}
+
 #############################################################################################
 # RAID 0 creation helpers
 
@@ -154,9 +161,7 @@ NUM_1DISK_TYPES=4
 
 teardown_1disk()
 {
-	find $TARGET -exec rm -rf {} \; &
-	wait
-	sync
+	erase_mountpoint
 	umount $TARGET
 }
 
@@ -206,12 +211,10 @@ NUM_2DISK_TYPES=8
 
 teardown_2disks()
 {
-	find $TARGET -exec rm -rf {} \; &
-	wait
+	erase_mountpoint
 
 	case "$1" in
 	*)
-		sync
 		umount $TARGET
 		stopraid
 		;;
@@ -297,12 +300,10 @@ NUM_3DISK_TYPES=16
 
 teardown_3disks()
 {
-	find $TARGET -exec rm -rf {} \; &
-	wait
+	erase_mountpoint
 
 	case "$1" in
 	*)
-		sync
 		umount $TARGET
 		stopraid
 		;;
@@ -371,12 +372,10 @@ NUM_4DISK_TYPES=12
 
 teardown_4disks()
 {
-	find $TARGET -exec rm -rf {} \; &
-	wait
+	erase_mountpoint
 
 	case "$1" in
 	*)
-		sync
 		umount $TARGET
 		stopraid
 		;;
