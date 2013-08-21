@@ -394,9 +394,17 @@ do_tests()
 
   pushd $TARGET >/dev/null
 
-  /usr/local/bin/fsx -N 250000 -S0 foo &
-  /usr/local/bin/fsstress -d . -n 15000 -p 8 -r &
-  wait
+  /usr/local/bin/fsx -N 250000 -S0 foo
+  if [ $? -ne 0 ]; then
+   echo something bad.
+   exit
+  fi
+
+  /usr/local/bin/fsstress -d . -n 15000 -p 8 -r
+  if [ $? -ne 0 ]; then
+   echo something bad.
+   exit
+  fi
 
   check_tainted
   popd >/dev/null
