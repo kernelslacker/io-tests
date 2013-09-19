@@ -17,6 +17,7 @@ DISK1=sdb1
 DISK2=sdc1
 DISK3=sdd1
 DISK4=
+MD=md0
 TARGET=/mnt/test
 
 #############################################################################################
@@ -52,8 +53,8 @@ wipedisks()
 
 stopraid()
 {
-  mdadm --manage --stop /dev/md/md0
-  echo stopped md0
+  mdadm --manage --stop /dev/md/$MD
+  echo stopped $MD
 }
 
 erase_mountpoint()
@@ -69,21 +70,21 @@ erase_mountpoint()
 raid0_2()
 {
   echo "Testing RAID0 (2 disks)"
-  mdadm --create -f --run md0 --level 0 --raid-devices 2 --rounding 64 /dev/$DISK1 /dev/$DISK2
+  mdadm --create -f --run $MD --level 0 --raid-devices 2 --rounding 64 /dev/$DISK1 /dev/$DISK2
   echo created RAID0
 }
 
 raid0_3()
 {
   echo "Testing RAID0 (3 disks)"
-  mdadm --create -f --run md0 --level 0 --raid-devices 3 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
+  mdadm --create -f --run $MD --level 0 --raid-devices 3 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID0
 }
 
 raid0_4()
 {
   echo "Testing RAID0 (4 disks)"
-  mdadm --create -f --run md0 --level 0 --raid-devices 4 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
+  mdadm --create -f --run $MD --level 0 --raid-devices 4 --rounding 64 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID0
 }
 
@@ -93,21 +94,21 @@ raid0_4()
 raid1_2()
 {
   echo "Testing RAID1 (2 disks)"
-  mdadm --create -f --run md0 --level 1 --raid-devices 2 /dev/$DISK1 /dev/$DISK2
+  mdadm --create -f --run $MD --level 1 --raid-devices 2 /dev/$DISK1 /dev/$DISK2
   echo created RAID1
 }
 
 raid1_3()
 {
   echo "Testing RAID1 (3 disks)"
-  mdadm --create -f --run md0 --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
+  mdadm --create -f --run $MD --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID1
 }
 
 raid1_4()
 {
   echo "Testing RAID1 (4 disks)"
-  mdadm --create -f --run md0 --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
+  mdadm --create -f --run $MD --level 1 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID1
 }
 
@@ -117,21 +118,21 @@ raid1_4()
 raid5_3()
 {
   echo "Testing RAID5 (3 disks)"
-  mdadm --create -f --run md0 --level 5 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
+  mdadm --create -f --run $MD --level 5 --raid-devices 3 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3
   echo created RAID5
 }
 
 raid5_3_missing()
 {
   echo "Testing RAID5 (3 disks + 1 missing)"
-  mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 missing
+  mdadm --create -f --run $MD --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 missing
   echo created RAID5
 }
 
 raid5_4()
 {
   echo "Testing RAID5 (4 disks)"
-  mdadm --create -f --run md0 --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
+  mdadm --create -f --run $MD --level 5 --raid-devices 4 /dev/$DISK1 /dev/$DISK2 /dev/$DISK3 /dev/$DISK4
   echo created RAID5
 }
 
@@ -173,36 +174,36 @@ setup_2disks()
 
 	case "$1" in
 	1)	raid0_2
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	2)	raid0_2
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	3)	raid0_2
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	4)	raid0_2
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	5)	raid1_2
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	6)	raid1_2
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	7)	raid1_2
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	8)	raid1_2
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	esac
 }
@@ -230,68 +231,68 @@ setup_3disks()
 
 	case "$1" in
 	1)	raid0_3
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	2)	raid0_3
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	3)	raid0_3
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	4)	raid0_3
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	5)	raid1_3
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	6)	raid1_3
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	7)	raid1_3
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	8)	raid1_3
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	9)	raid5_3
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	10)	raid5_3
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	11)	raid5_3
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	12)	raid5_3
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	13)	raid5_3_missing
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	14)	raid5_3_missing
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	15)	raid5_3_missing
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	16)	raid5_3_missing
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 
 	esac
@@ -319,52 +320,52 @@ setup_4disks()
 
 	case "$1" in
 	1)	raid0_4
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	2)	raid0_4
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	3)	raid0_4
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	4)	raid0_4
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	5)	raid1_4
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	6)	raid1_4
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	7)	raid1_4
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	8)	raid1_4
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	9)	raid5_4
-		mkfs.btrfs -f /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.btrfs -f /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	10)	raid5_4
-		mkfs.ext4 -F -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	11)	raid5_4
-		mkfs.ext4 -F -q -b 1024 /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.ext4 -F -q -b 1024 /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	12)	raid5_4
-		mkfs.xfs -f -q /dev/md/md0
-		mount /dev/md/md0 $TARGET
+		mkfs.xfs -f -q /dev/md/$MD
+		mount /dev/md/$MD $TARGET
 		;;
 	esac
 }
